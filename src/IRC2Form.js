@@ -1,13 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Form, Input, Button } from 'antd';
 import { IconService } from 'icon-sdk-js';
 
-const IRC2Form = ({address}) => {
+const IRC2Form = ({address, networkId}) => {
+
+    const [transaction_result, setTransactionResult] = useState('');
 
     const eventHandler = event => {
         const { type, payload } = event.detail;
         if (type === 'RESPONSE_JSON-RPC') {
             console.log(payload)
+            setTransactionResult(payload);
         }
 
         else if (type === 'CANCEL_JSON-RPC') {
@@ -23,7 +26,7 @@ const IRC2Form = ({address}) => {
         const deployTransaction = deployTransactionBuilder
             .from(address)
             .to('cx0000000000000000000000000000000000000000')
-            .nid(iconService.IconConverter.toBigNumber(2))
+            .nid(iconService.IconConverter.toBigNumber(networkId))
             .value(iconService.IconConverter.toBigNumber(0))
             .timestamp((new Date()).getTime() * 1000)
             .stepLimit(iconService.IconConverter.toBigNumber(1120000000))
@@ -55,37 +58,41 @@ const IRC2Form = ({address}) => {
     };
 
     return (
-        <div>
-            <h5>Address: {address}</h5>
+        <div style={{textAlign: 'center'}}>
+            <h3>Deploying IRC2 (Fungible Token)</h3>
+            <h4>Address: {address}</h4>
             <Form
                 name="irc2Form"
                 onFinish={onFinish}
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-
-                style={{ maxWidth: 600, margin: '0 auto' }}
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
+                style={{maxWidth: 600, margin: '0 auto'}}
             >
                 <Form.Item
                     label="Token Name"
                     name="name"
-                    rules={[{ required: true, message: 'Please input your token name!' }]}
+                    rules={[{required: true, message: 'Please input your token name!'}]}
                 >
-                    <Input />
+                    <Input placeholder="MyIRC2Token"/>
                 </Form.Item>
 
                 <Form.Item
                     label="Token Symbol"
                     name="symbol"
-                    rules={[{ required: true, message: 'Please input your token symbol!' }]}
+                    rules={[{required: true, message: 'Please input your token symbol!'}]}
                 >
-                    <Input />
+                    <Input placeholder="MIT"/>
                 </Form.Item>
 
                 <Form.Item
                     label="Decimals"
                     name="decimals"
                     rules={[
-                        { required: true, message: 'Please input the decimal count!' },
+                        {required: true, message: 'Please input the decimal count!'},
+                        {
+                            pattern: new RegExp(/^[0-9]+$/),
+                            message: 'Please input numbers only!'
+                        },
                         {
                             validator: (_, value) =>
                                 value && value <= 21
@@ -94,23 +101,37 @@ const IRC2Form = ({address}) => {
                         }
                     ]}
                 >
-                    <Input />
+                    <Input placeholder="18"/>
                 </Form.Item>
 
                 <Form.Item
                     label="Initial Supply"
                     name="initialSupply"
-                    rules={[{ required: true, message: 'Please input the initial supply!' }]}
+                    rules={[
+                        {required: true, message: 'Please input the initial supply!'},
+                        {
+                            pattern: new RegExp(/^[0-9]+$/),
+                            message: 'Please input numbers only!'
+                        },
+                    ]}
                 >
-                    <Input />
+                    <Input placeholder="69420"/>
                 </Form.Item>
 
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                <Form.Item wrapperCol={{offset: 8, span: 16}}>
                     <Button type="primary" htmlType="submit">
                         Deploy Token
                     </Button>
                 </Form.Item>
             </Form>
+            {transaction_result && (
+                <div>
+                    <h3>Transaction Result:</h3>
+                    {transaction_result.error ?
+                        (transaction_result.error) :
+                        (<a target='_blank' rel='noopener noreferrer' href={`https://tracker.${networkId === 2 ? 'lisbon.' : ''}icon.community/transaction/${transaction_result.result}`}>{transaction_result.result}</a>)}
+                </div>
+            )}
         </div>
 
     );

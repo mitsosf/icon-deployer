@@ -1,13 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Form, Input, Button } from 'antd';
 import { IconService } from 'icon-sdk-js';
 
-const IRC3Form = ({address}) => {
+const IRC3Form = ({address, networkId}) => {
+    const [transaction_result, setTransactionResult] = useState('');
+
 
     const eventHandler = event => {
         const { type, payload } = event.detail;
         if (type === 'RESPONSE_JSON-RPC') {
             console.log(payload)
+            setTransactionResult(payload);
         }
 
         else if (type === 'CANCEL_JSON-RPC') {
@@ -23,10 +26,10 @@ const IRC3Form = ({address}) => {
         const deployTransaction = deployTransactionBuilder
             .from(address)
             .to('cx0000000000000000000000000000000000000000')
-            .nid(iconService.IconConverter.toBigNumber(2))
+            .nid(iconService.IconConverter.toBigNumber(networkId))
             .value(iconService.IconConverter.toBigNumber(0))
             .timestamp((new Date()).getTime() * 1000)
-            .stepLimit(iconService.IconConverter.toBigNumber(10000000000))
+            .stepLimit(iconService.IconConverter.toBigNumber(1120000000))
             .version(iconService.IconConverter.toBigNumber(3))
             .contentType('application/java')
             .nonce(iconService.IconConverter.toBigNumber(1))
@@ -53,37 +56,47 @@ const IRC3Form = ({address}) => {
     };
 
     return (
-        <div>
-            <h5>Address: {address}</h5>
+        <div style={{textAlign: 'center'}}>
+            <h3>Deploying IRC3 (Non-Fungible Token)</h3>
+            <h4>Address: {address}</h4>
+
             <Form
                 name="irc3Form"
                 onFinish={onFinish}
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
 
-                style={{ maxWidth: 600, margin: '0 auto' }}
+                style={{maxWidth: 600, margin: '0 auto'}}
             >
                 <Form.Item
-                    label="NFT Name"
+                    label="IRC3 Name"
                     name="name"
-                    rules={[{ required: true, message: 'Please input your NFT name!' }]}
+                    rules={[{required: true, message: 'Please input your IRC3 name!'}]}
                 >
-                    <Input />
+                    <Input placeholder="MyIRC3Token"/>
                 </Form.Item>
 
                 <Form.Item
-                    label="NFT Symbol"
+                    label="IRC3 Symbol"
                     name="symbol"
-                    rules={[{ required: true, message: 'Please input your NFT symbol!' }]}
+                    rules={[{required: true, message: 'Please input your IRC3 symbol!'}]}
                 >
-                    <Input />
+                    <Input placeholder="NFT"/>
                 </Form.Item>
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                <Form.Item wrapperCol={{offset: 8, span: 16}}>
                     <Button type="primary" htmlType="submit">
-                        Deploy NFT
+                        Deploy IRC3
                     </Button>
                 </Form.Item>
             </Form>
+            {transaction_result && (
+                <div>
+                    <h3>Transaction Result:</h3>
+                    {transaction_result.error ?
+                        (transaction_result.error) :
+                        (<a target='_blank' rel='noopener noreferrer' href={`https://tracker.${networkId === 2 ? 'lisbon.' : ''}icon.community/transaction/${transaction_result.result}`}>{transaction_result.result}</a>)}
+                </div>
+            )}
         </div>
 
     );
