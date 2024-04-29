@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import { Button, Layout, Menu , Switch } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import { DollarCircleOutlined, GoldOutlined } from '@ant-design/icons';
-const { Header, Content, Sider } = Layout;
+const { Header, Content, Sider, Footer} = Layout;
 
 function App() {
     const [address, setAddress] = useState('');
@@ -43,7 +43,11 @@ function App() {
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible>
-                <div className="logo" />
+                <Header style={{ display: 'flex', alignItems: 'center' }}>
+                    <div className="demo-logo" style={{color: 'white'}}>
+                        ICON Deployer
+                    </div>
+                </Header>
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
                     <Menu.Item key="1" icon={<DollarCircleOutlined />} onClick={() => setTokenType('IRC2')}>
                         IRC2
@@ -99,9 +103,13 @@ function App() {
                         )}
                     </div>
                 </Content>
+                <Footer style={{textAlign: 'center'}}>
+                    Copyright ©{new Date().getFullYear()}. Created by <a target='_blank' rel='noreferrer nofollow' href="https://github.com/mitsosf">Dimitris
+                    F.</a> of <a target='_blank' rel='noreferrer nofollow' href="https://iconation.team/">ICONation</a>
+                </Footer>
             </Layout>
         </Layout>
-);
+    );
 }
 
 export default App;
