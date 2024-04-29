@@ -26,7 +26,7 @@ const IRC2Form = ({address}) => {
             .nid(iconService.IconConverter.toBigNumber(2))
             .value(iconService.IconConverter.toBigNumber(0))
             .timestamp((new Date()).getTime() * 1000)
-            .stepLimit(iconService.IconConverter.toBigNumber(10000000000))
+            .stepLimit(iconService.IconConverter.toBigNumber(1120000000))
             .version(iconService.IconConverter.toBigNumber(3))
             .contentType('application/java')
             .nonce(iconService.IconConverter.toBigNumber(1))
@@ -84,7 +84,15 @@ const IRC2Form = ({address}) => {
                 <Form.Item
                     label="Decimals"
                     name="decimals"
-                    rules={[{ required: true, message: 'Please input the decimal count!' }]}
+                    rules={[
+                        { required: true, message: 'Please input the decimal count!' },
+                        {
+                            validator: (_, value) =>
+                                value && value <= 21
+                                    ? Promise.resolve()
+                                    : Promise.reject(new Error('Decimal count must be less than 21'))
+                        }
+                    ]}
                 >
                     <Input />
                 </Form.Item>
